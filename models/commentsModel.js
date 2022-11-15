@@ -1,7 +1,6 @@
 const db = require("../db/connection.js");
 
 exports.selectComments = (review_id) => {
-  if (/[1-9]+/.test(review_id)) {
     return db.query("SELECT * FROM reviews WHERE review_id = $1", [review_id]).then(
       (reviewres) => {
         if (reviewres.rows.length > 0) {
@@ -15,6 +14,4 @@ exports.selectComments = (review_id) => {
         }
       }
     );
-  }
-  return Promise.reject({ status: 400, msg: "Bad Request" });
 };

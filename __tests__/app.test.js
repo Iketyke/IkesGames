@@ -83,8 +83,8 @@ describe("/api/reviews", () => {
           .then((res) => {
             expect(Array.isArray(res.body)).toBe(true);
             expect(res.body).toHaveLength(3);
-            res.body.forEach((review) => {
-              expect(review).toEqual(
+            res.body.forEach((comment) => {
+              expect(comment).toEqual(
                 expect.objectContaining({
                   comment_id: expect.any(Number),
                   votes: expect.any(Number),
