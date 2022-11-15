@@ -14,19 +14,15 @@ exports.selectReviews = () => {
 };
 
 exports.selectReview = (review_id) => {
-  if (/[1-9]+/.test(review_id)) {
-    const reviewQuery = {
-      text: "SELECT * FROM reviews WHERE review_id = $1",
-      values: [review_id],
-    };
-    return db.query(reviewQuery).then((res) => {
-      if (res.rows[0]) {
-        return {review :res.rows[0]};
-      } else {
-        return Promise.reject({ status: 404, msg: "Review Not Found" });
-      }
-    });
-  }
-
-  return Promise.reject({ status: 400, msg: "Bad Request" });
+  const reviewQuery = {
+    text: "SELECT * FROM reviews WHERE review_id = $1",
+    values: [review_id],
+  };
+  return db.query(reviewQuery).then((res) => {
+    if (res.rows[0]) {
+      return { review: res.rows[0] };
+    } else {
+      return Promise.reject({ status: 404, msg: "Review Not Found" });
+    }
+  });
 };

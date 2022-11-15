@@ -74,6 +74,44 @@ describe("/api/reviews", () => {
           expect(body.review.review_id).toBe(review_id);
         });
     });
+    describe("/api/reviews/:reviews_id/comments", () => {
+      test("GET - 200 responds with an array of comments", () => {
+        const review_id = 2;
+        return request(app)
+          .get("/api/reviews/" + review_id +"/comments")
+          .expect(200)
+          .then((res) => {
+            expect(Array.isArray(res.body)).toBe(true);
+            expect(res.body).toHaveLength(3);
+            res.body.forEach((comment) => {
+              expect(comment).toEqual(
+                expect.objectContaining({
+                  comment_id: expect.any(Number),
+                  votes: expect.any(Number),
+                  created_at: expect.any(String),
+                  author: expect.any(String),
+                  body: expect.any(String),
+                  review_id: expect.any(Number)
+                })
+              );
+            });
+            expect(res.body).toBeSortedBy("created_at", {
+              descending: true,
+            });
+          });
+      });
+      test("GET - 200 responds with an empty array if no comments found", () => {
+        const review_id = 4;
+        return request(app)
+          .get("/api/reviews/" + review_id +"/comments")
+          .expect(200)
+          .then((res) => {
+            expect(Array.isArray(res.body)).toBe(true);
+            expect(res.body).toHaveLength(0);
+          });
+      });
+
+    });
   });
 });
 
@@ -102,6 +140,24 @@ describe("Error Handling", () => {
         .then((res) => {
           expect(res.body.msg).toBe("Review Not Found");
         });
+    });
+    describe('/api/reviews/:reviews_id/comments', () => {
+      test("GET - 400 invalid review_id: Bad Request", () => {
+        return request(app)
+          .get("/api/reviews/notavalidreviewid/comments")
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).toBe("Bad Request");
+          });
+      });
+      test("GET - 404 review not found", () => {
+        return request(app)
+          .get("/api/reviews/1000000/comments")
+          .expect(404)
+          .then((res) => {
+            expect(res.body.msg).toBe("Review Not Found");
+          });
+      });
     });
   });
 });
