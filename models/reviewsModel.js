@@ -21,7 +21,7 @@ exports.selectReview = (review_id) => {
     };
     return db.query(reviewQuery).then((res) => {
       if (res.rows[0]) {
-        return res.rows[0];
+        return {review :res.rows[0]};
       } else {
         return Promise.reject({ status: 404, msg: "Review Not Found" });
       }
