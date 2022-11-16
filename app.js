@@ -1,14 +1,16 @@
 const { getCategories } = require("./controllers/categoriesController");
 const { getReviews, getReview } = require("./controllers/reviewsController");
-const { getComments } = require("./controllers/commentsController");
+const { getComments, postComment } = require("./controllers/commentsController");
 
 const express = require("express");
 const app = express();
+app.use(express.json());
 
 app.get("/api/categories", getCategories);
 app.get("/api/reviews", getReviews);
 app.get("/api/reviews/:review_id", getReview);
 app.get("/api/reviews/:review_id/comments", getComments);
+app.post("/api/reviews/:review_id/comments", postComment);
 
 //Error Handling
 app.all("/*", (req, res) => {
@@ -24,7 +26,15 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log(err.code);
+  if (err.code === "23503") {
+    if (err.detail.endsWith('"reviews".')) res.status(404).send({ msg: "Review Not Found" });
+    else if (err.detail.endsWith('"users".')) res.status(404).send({ msg: "User Not Found" });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
   res.status(err.status).send({ msg: err.msg });
 });
 
