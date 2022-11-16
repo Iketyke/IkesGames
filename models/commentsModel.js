@@ -24,5 +24,5 @@ exports.insertComment = (review_id, { body, username }) => {
     };
     return db.query(commentQuery).then((res) => res.rows[0]);
   }
-  else  return Promise.reject({status: 403, msg: "Invalid Format" })
+  else  return Promise.reject({status: 400, msg: "Invalid Format" })
 };

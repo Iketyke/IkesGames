@@ -225,7 +225,7 @@ describe("Error Handling", () => {
         return request(app)
           .post("/api/reviews/2/comments")
           .send(comment)
-          .expect(403)
+          .expect(400)
           .then((res) => {
             expect(res.body.msg).toBe("Invalid Format");
           });
@@ -238,7 +238,7 @@ describe("Error Handling", () => {
         return request(app)
           .post("/api/reviews/2/comments")
           .send(comment)
-          .expect(403)
+          .expect(400)
           .then((res) => {
             expect(res.body.msg).toBe("Invalid Format");
           });
@@ -251,7 +251,7 @@ describe("Error Handling", () => {
         return request(app)
           .post("/api/reviews/2/comments")
           .send(comment)
-          .expect(403)
+          .expect(400)
           .then((res) => {
             expect(res.body.msg).toBe("Invalid Format");
           });
@@ -264,7 +264,7 @@ describe("Error Handling", () => {
         return request(app)
           .post("/api/reviews/2/comments")
           .send(comment)
-          .expect(403)
+          .expect(400)
           .then((res) => {
             expect(res.body.msg).toBe("Invalid Format");
           });
