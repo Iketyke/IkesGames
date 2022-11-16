@@ -78,7 +78,7 @@ describe("/api/reviews", () => {
       test("GET - 200 responds with an array of comments", () => {
         const review_id = 2;
         return request(app)
-          .get("/api/reviews/" + review_id +"/comments")
+          .get("/api/reviews/" + review_id + "/comments")
           .expect(200)
           .then((res) => {
             expect(Array.isArray(res.body)).toBe(true);
@@ -91,7 +91,7 @@ describe("/api/reviews", () => {
                   created_at: expect.any(String),
                   author: expect.any(String),
                   body: expect.any(String),
-                  review_id: expect.any(Number)
+                  review_id: expect.any(Number),
                 })
               );
             });
@@ -103,14 +103,35 @@ describe("/api/reviews", () => {
       test("GET - 200 responds with an empty array if no comments found", () => {
         const review_id = 4;
         return request(app)
-          .get("/api/reviews/" + review_id +"/comments")
+          .get("/api/reviews/" + review_id + "/comments")
           .expect(200)
           .then((res) => {
             expect(Array.isArray(res.body)).toBe(true);
             expect(res.body).toHaveLength(0);
           });
       });
-
+      test("POST - 201 responds with the posted comment", () => {
+        const review_id = 4;
+        const comment = {
+          username: "mallionaire",
+          body: "luv me games, simple as",
+        };
+        return request(app)
+          .post("/api/reviews/" + review_id + "/comments")
+          .send(comment)
+          .expect(201)
+          .then(({ body }) => {
+            expect(body.comment).toEqual(
+              expect.objectContaining({
+                body: "luv me games, simple as",
+                votes: 0,
+                author: "mallionaire",
+                review_id: review_id,
+                created_at: expect.any(String),
+              })
+            );
+          });
+      });
     });
   });
 });
@@ -141,7 +162,7 @@ describe("Error Handling", () => {
           expect(res.body.msg).toBe("Review Not Found");
         });
     });
-    describe('/api/reviews/:reviews_id/comments', () => {
+    describe("/api/reviews/:reviews_id/comments", () => {
       test("GET - 400 invalid review_id: Bad Request", () => {
         return request(app)
           .get("/api/reviews/notavalidreviewid/comments")
@@ -156,6 +177,96 @@ describe("Error Handling", () => {
           .expect(404)
           .then((res) => {
             expect(res.body.msg).toBe("Review Not Found");
+          });
+      });
+      test("POST - 400 invalid review_id: Bad Request", () => {
+        const comment = {
+          username: "mallionaire",
+          body: "luv me games, simple as",
+        };
+        return request(app)
+          .post("/api/reviews/notavalidreviewid/comments")
+          .send(comment)
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).toBe("Bad Request");
+          });
+      });
+      test("POST - 404 review not found", () => {
+        const comment = {
+          username: "mallionaire",
+          body: "luv me games, simple as",
+        };
+        return request(app)
+          .post("/api/reviews/1000000/comments")
+          .send(comment)
+          .expect(404)
+          .then((res) => {
+            expect(res.body.msg).toBe("Review Not Found");
+          });
+      });
+      test("POST - 404 Username not found", () => {
+        const comment = {
+          username: "iketyke",
+          body: "luv me games, simple as",
+        };
+        return request(app)
+          .post("/api/reviews/2/comments")
+          .send(comment)
+          .expect(404)
+          .then((res) => {
+            expect(res.body.msg).toBe("User Not Found");
+          });
+      });
+      test("POST - 400 invalid object - body missing", () => {
+        const comment = {
+          username: "mallionaire",
+        };
+        return request(app)
+          .post("/api/reviews/2/comments")
+          .send(comment)
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).toBe("Invalid Format");
+          });
+      });
+      test("POST - 400 empty body in the object", () => {
+        const comment = {
+          username: "mallionaire",
+          body: "",
+        };
+        return request(app)
+          .post("/api/reviews/2/comments")
+          .send(comment)
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).toBe("Invalid Format");
+          });
+      });
+      test("POST - 400 Body is an invalid type - number", () => {
+        const comment = {
+          username: "mallionaire",
+          body: 231759075,
+        };
+        return request(app)
+          .post("/api/reviews/2/comments")
+          .send(comment)
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).toBe("Invalid Format");
+          });
+      });
+      test("POST - 400 Body is an invalid type - array", () => {
+        const comment = {
+          username: "mallionaire",
+          body: [1,2,3,4,5],
+        };
+        return request(app)
+          .post("/api/reviews/2/comments")
+          .send(comment)
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).toBe("Invalid Format");
           });
       });
     });
