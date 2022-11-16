@@ -27,13 +27,18 @@ exports.selectReview = (review_id) => {
   });
 };
 
-exports.updateReview = (review_id, {inc_votes}) => {
-  const  reviewQuery = {
-    text: "UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING *;",
-    values: [inc_votes, review_id]
-  };
-  return db.query(reviewQuery).then(res => {
-    console.log(res.rows[0])
-    return {review: res.rows[0]};
-  })
-}
+exports.updateReview = (review_id, { inc_votes }) => {
+  if (typeof inc_votes === "number") {
+    const reviewQuery = {
+      text: "UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING *;",
+      values: [inc_votes, review_id],
+    };
+    return db.query(reviewQuery).then((res) => {
+      if (res.rows[0]) {
+        return { review: res.rows[0] };
+      } else {
+        return Promise.reject({ status: 404, msg: "Review Not Found" });
+      }
+    });
+  } else return Promise.reject({ status: 400, msg: "Invalid Format" });
+};

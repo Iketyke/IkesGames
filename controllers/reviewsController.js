@@ -21,7 +21,7 @@ exports.getReview = (req, res, next) => {
 };
 
 exports.patchReview = (req, res, next) => {
-  console.log(req.body)
+  
   updateReview(req.params.review_id, req.body)
     .then((review) => {
       res.status(200).send(review);
