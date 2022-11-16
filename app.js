@@ -1,16 +1,23 @@
 const { getCategories } = require("./controllers/categoriesController");
 const { getReviews, getReview } = require("./controllers/reviewsController");
 const { getComments, postComment } = require("./controllers/commentsController");
+const { getUsers } = require("./controllers/usersController");
 
 const express = require("express");
 const app = express();
 app.use(express.json());
 
+//Categories 
 app.get("/api/categories", getCategories);
+
+//Reviews
 app.get("/api/reviews", getReviews);
 app.get("/api/reviews/:review_id", getReview);
 app.get("/api/reviews/:review_id/comments", getComments);
 app.post("/api/reviews/:review_id/comments", postComment);
+
+//Users
+app.get("/api/users", getUsers);
 
 //Error Handling
 app.all("/*", (req, res) => {
