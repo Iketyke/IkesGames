@@ -70,7 +70,7 @@ describe("/api/reviews", () => {
         });
       });
   });
-  describe("/api/reviews/:reviews_id", () => {
+  describe("/api/reviews/:review_id", () => {
     test("GET - 200 responds with a single review object", () => {
       const review_id = 4;
       return request(app)
@@ -79,7 +79,7 @@ describe("/api/reviews", () => {
         .then(({ body }) => {
           expect(body.review).toEqual(
             expect.objectContaining({
-              review_id: expect.any(Number),
+              review_id: review_id,
               title: expect.any(String),
               review_body: expect.any(String),
               designer: expect.any(String),
@@ -90,10 +90,33 @@ describe("/api/reviews", () => {
               created_at: expect.any(String),
             })
           );
-          expect(body.review.review_id).toBe(review_id);
         });
     });
-    describe("/api/reviews/:reviews_id/comments", () => {
+    test("PATCH - 200 increments votes", () => {
+      const review_id = 2;
+      const votes = { inc_votes: 5 };
+      return request(app)
+        .patch("/api/reviews/" + review_id)
+        .send(votes)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.review.review_id).toBe(review_id);
+          expect(body.review.votes).toBe(10);
+        });
+    });
+    test("PATCH - 200 also Decrements votes", () => {
+      const review_id = 2;
+      const votes = { inc_votes: -2 };
+      return request(app)
+        .patch("/api/reviews/" + review_id)
+        .send(votes)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.review.review_id).toBe(review_id);
+          expect(body.review.votes).toBe(3);
+        });
+    });
+    describe("/api/reviews/:review_id/comments", () => {
       test("GET - 200 responds with an array of comments", () => {
         const review_id = 2;
         return request(app)
@@ -179,6 +202,61 @@ describe("Error Handling", () => {
         .expect(404)
         .then((res) => {
           expect(res.body.msg).toBe("Review Not Found");
+        });
+    });
+    test("PATCH - 400 invalid review_id: Bad Request", () => {
+      const review_id = "notareviewid";
+      const votes = { inc_votes: -2 };
+      return request(app)
+        .patch("/api/reviews/" + review_id)
+        .send(votes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("PATCH - 404 review not found", () => {
+      const review_id = 100000;
+      const votes = { inc_votes: -2 };
+      return request(app)
+        .patch("/api/reviews/" + review_id)
+        .send(votes)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Review Not Found");
+        });
+    });
+    test("PATCH - 400 invalid object - inc_votes missing", () => {
+      const review_id = 2;
+      const votes = {};
+      return request(app)
+        .patch("/api/reviews/" + review_id)
+        .send(votes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid Format");
+        });
+    });
+    test("PATCH - 400 invalid object - inc_votes is the wrong type", () => {
+      const review_id = 2;
+      const votes = {inc_votes: "five" };
+      return request(app)
+        .patch("/api/reviews/" + review_id)
+        .send(votes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid Format");
+        });
+    });
+    test("PATCH - 400 invalid object - inc_votes is misspelt", () => {
+      const review_id = 2;
+      const votes = {inc_votea: "five" };
+      return request(app)
+        .patch("/api/reviews/" + review_id)
+        .send(votes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid Format");
         });
     });
     describe("/api/reviews/:reviews_id/comments", () => {
@@ -278,7 +356,7 @@ describe("Error Handling", () => {
       test("POST - 400 Body is an invalid type - array", () => {
         const comment = {
           username: "mallionaire",
-          body: [1,2,3,4,5],
+          body: [1, 2, 3, 4, 5],
         };
         return request(app)
           .post("/api/reviews/2/comments")
