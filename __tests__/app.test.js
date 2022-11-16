@@ -229,6 +229,17 @@ describe("Error Handling", () => {
           expect(body.msg).toBe("Invalid Format");
         });
     });
+    test("PATCH - 400 invalid object - inc_votes is misspelt", () => {
+      const review_id = 2;
+      const votes = {inc_votea: "five" };
+      return request(app)
+        .patch("/api/reviews/" + review_id)
+        .send(votes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid Format");
+        });
+    });
     describe("/api/reviews/:reviews_id/comments", () => {
       test("GET - 400 invalid review_id: Bad Request", () => {
         return request(app)
