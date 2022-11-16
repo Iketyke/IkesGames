@@ -26,3 +26,14 @@ exports.selectReview = (review_id) => {
     }
   });
 };
+
+exports.updateReview = (review_id, {inc_votes}) => {
+  const  reviewQuery = {
+    text: "UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING *;",
+    values: [inc_votes, review_id]
+  };
+  return db.query(reviewQuery).then(res => {
+    console.log(res.rows[0])
+    return {review: res.rows[0]};
+  })
+}

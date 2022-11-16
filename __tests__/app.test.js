@@ -51,7 +51,7 @@ describe("/api/reviews", () => {
         });
       });
   });
-  describe("/api/reviews/:reviews_id", () => {
+  describe("/api/reviews/:review_id", () => {
     test("GET - 200 responds with a single review object", () => {
       const review_id = 4;
       return request(app)
@@ -60,7 +60,7 @@ describe("/api/reviews", () => {
         .then(({ body }) => {
           expect(body.review).toEqual(
             expect.objectContaining({
-              review_id: expect.any(Number),
+              review_id: review_id,
               title: expect.any(String),
               review_body: expect.any(String),
               designer: expect.any(String),
@@ -71,14 +71,25 @@ describe("/api/reviews", () => {
               created_at: expect.any(String),
             })
           );
-          expect(body.review.review_id).toBe(review_id);
         });
     });
-    describe("/api/reviews/:reviews_id/comments", () => {
+    test("PATCH - 200 increments votes", () => {
+      const review_id = 2;
+      const votes = { inc_votes: 5 };
+      return request(app)
+        .patch("/api/reviews/" + review_id)
+        .send(votes)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.review.review_id).toBe(review_id);
+          expect(body.review.votes).toBe(10);
+        });
+    });
+    describe("/api/reviews/:review_id/comments", () => {
       test("GET - 200 responds with an array of comments", () => {
         const review_id = 2;
         return request(app)
-          .get("/api/reviews/" + review_id +"/comments")
+          .get("/api/reviews/" + review_id + "/comments")
           .expect(200)
           .then((res) => {
             expect(Array.isArray(res.body)).toBe(true);
@@ -91,7 +102,7 @@ describe("/api/reviews", () => {
                   created_at: expect.any(String),
                   author: expect.any(String),
                   body: expect.any(String),
-                  review_id: expect.any(Number)
+                  review_id: expect.any(Number),
                 })
               );
             });
@@ -103,14 +114,13 @@ describe("/api/reviews", () => {
       test("GET - 200 responds with an empty array if no comments found", () => {
         const review_id = 4;
         return request(app)
-          .get("/api/reviews/" + review_id +"/comments")
+          .get("/api/reviews/" + review_id + "/comments")
           .expect(200)
           .then((res) => {
             expect(Array.isArray(res.body)).toBe(true);
             expect(res.body).toHaveLength(0);
           });
       });
-
     });
   });
 });
@@ -141,7 +151,7 @@ describe("Error Handling", () => {
           expect(res.body.msg).toBe("Review Not Found");
         });
     });
-    describe('/api/reviews/:reviews_id/comments', () => {
+    describe("/api/reviews/:reviews_id/comments", () => {
       test("GET - 400 invalid review_id: Bad Request", () => {
         return request(app)
           .get("/api/reviews/notavalidreviewid/comments")
