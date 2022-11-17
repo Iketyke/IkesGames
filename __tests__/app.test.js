@@ -180,10 +180,10 @@ describe("/api/reviews", () => {
         });
       });
   });
-  test("GET - 200 an invalid category returns an empty array", () => {
+  test("GET - 200 an category with no reviews returns an empty array", () => {
     return request(app)
       .get(
-        "/api/reviews?category=FPS"
+        "/api/reviews?category=children's%20games"
       )
       .expect(200)
       .then((res) => {
@@ -346,6 +346,14 @@ describe("Error Handling", () => {
     test("GET - 400 invalid order query - bad request", () => {
       return request(app)
           .get("/api/reviews?order=lefttoright")
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).toBe("Bad Request");
+          });
+    });
+    test("GET - 400 invalid order query - bad request", () => {
+      return request(app)
+          .get("/api/reviews?category=notavalidcategory")
           .expect(400)
           .then((res) => {
             expect(res.body.msg).toBe("Bad Request");

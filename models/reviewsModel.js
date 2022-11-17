@@ -10,26 +10,31 @@ exports.selectReviews = (category, sort_by = "created_at", order = "DESC") => {
     "votes",
     "category",
     "owner",
-    "created_at"
+    "created_at",
   ];
   const validOrders = ["ASC", "asc", "desc", "DESC"];
-
-  if (validSorts.includes(sort_by) && validOrders.includes(order)) {
-    const reviewQuery = {
-      text: "SELECT reviews.owner, reviews.title, reviews.review_id, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer, COUNT(comments) AS comment_count from reviews LEFT JOIN comments ON reviews.review_id = comments.review_id",
-      values: [],
-    };
-    if (category) {
-      reviewQuery.text += " WHERE reviews.category = $1";
-      reviewQuery.values.push(category);
-    }
-    reviewQuery.text += ` GROUP BY reviews.review_id ORDER BY ${
-      sort_by + " " + order
-    };`;
-    return db.query(reviewQuery).then((res) => res.rows);
-  } else {
-    return Promise.reject({status: 400, msg: "Bad Request"});
-  }
+  return db
+    .query("SELECT * FROM categories WHERE slug = $1", [category])
+    .then((catExists) => {
+      if (catExists.rows.length > 0 || !category) {
+        if (validSorts.includes(sort_by) && validOrders.includes(order)) {
+          const reviewQuery = {
+            text: "SELECT reviews.owner, reviews.title, reviews.review_id, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer, COUNT(comments) AS comment_count from reviews LEFT JOIN comments ON reviews.review_id = comments.review_id",
+            values: [],
+          };
+          if (category) {
+            reviewQuery.text +=
+              " WHERE reviews.category = (SELECT slug from categories WHERE slug = $1)";
+            reviewQuery.values.push(category);
+          }
+          reviewQuery.text += ` GROUP BY reviews.review_id ORDER BY ${
+            sort_by + " " + order
+          };`;
+          return db.query(reviewQuery).then((res) => res.rows);
+        }
+      }
+      return Promise.reject({ status: 400, msg: "Bad Request" });
+    });
 };
 
 exports.selectReview = (review_id) => {
