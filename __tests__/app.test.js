@@ -23,6 +23,25 @@ describe("/api/categories", () => {
       });
   });
 });
+describe('/api/users', () => {
+  test('GET - 200 responds with an array of user objects', () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({body}) => {
+        expect(body).toHaveLength(4);
+        body.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String)
+            })
+          );
+        });
+      });
+  });
+});
 describe("/api/reviews", () => {
   test("GET - 200 responds with an array of review objects ordered by date descending", () => {
     return request(app)
