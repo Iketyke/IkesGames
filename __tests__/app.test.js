@@ -23,22 +23,32 @@ describe("/api/categories", () => {
       });
   });
 });
-describe('/api/users', () => {
-  test('GET - 200 responds with an array of user objects', () => {
+describe("/api/users", () => {
+  test("GET - 200 responds with an array of user objects", () => {
     return request(app)
       .get("/api/users")
       .expect(200)
-      .then(({body}) => {
+      .then(({ body }) => {
         expect(body).toHaveLength(4);
         body.forEach((user) => {
           expect(user).toEqual(
             expect.objectContaining({
               username: expect.any(String),
               name: expect.any(String),
-              avatar_url: expect.any(String)
+              avatar_url: expect.any(String),
             })
           );
         });
+      });
+  });
+});
+describe("/api/comments/:comment_id", () => {
+  test("DELETE - 204 deletes the given comment by comment_id", () => {
+    return request(app)
+      .delete("/api/comments/4")
+      .expect(204)
+      .then((res) => {
+        expect(res.body).toEqual({});
       });
   });
 });
@@ -80,13 +90,14 @@ describe("/api/reviews", () => {
           expect(body.review).toEqual(
             expect.objectContaining({
               review_id: review_id,
-              title: 'Jenga',
-              review_body: 'Fiddly fun for all the family',
-              designer: 'Leslie Scott',
-              review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+              title: "Jenga",
+              review_body: "Fiddly fun for all the family",
+              designer: "Leslie Scott",
+              review_img_url:
+                "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
               votes: 5,
-              category: 'dexterity',
-              owner: 'philippaclaire9',
+              category: "dexterity",
+              owner: "philippaclaire9",
               created_at: expect.any(String),
             })
           );
@@ -102,13 +113,14 @@ describe("/api/reviews", () => {
             expect.objectContaining({
               comment_count: "3",
               review_id: review_id,
-              title: 'Jenga',
-              review_body: 'Fiddly fun for all the family',
-              designer: 'Leslie Scott',
-              review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+              title: "Jenga",
+              review_body: "Fiddly fun for all the family",
+              designer: "Leslie Scott",
+              review_img_url:
+                "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
               votes: 5,
-              category: 'dexterity',
-              owner: 'philippaclaire9',
+              category: "dexterity",
+              owner: "philippaclaire9",
               created_at: expect.any(String),
             })
           );
@@ -262,7 +274,7 @@ describe("Error Handling", () => {
     });
     test("PATCH - 400 invalid object - inc_votes is the wrong type", () => {
       const review_id = 2;
-      const votes = {inc_votes: "five" };
+      const votes = { inc_votes: "five" };
       return request(app)
         .patch("/api/reviews/" + review_id)
         .send(votes)
@@ -273,7 +285,7 @@ describe("Error Handling", () => {
     });
     test("PATCH - 400 invalid object - inc_votes is misspelt", () => {
       const review_id = 2;
-      const votes = {inc_votea: "five" };
+      const votes = { inc_votea: "five" };
       return request(app)
         .patch("/api/reviews/" + review_id)
         .send(votes)
