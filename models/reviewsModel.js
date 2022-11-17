@@ -15,7 +15,7 @@ exports.selectReviews = () => {
 
 exports.selectReview = (review_id) => {
   const reviewQuery = {
-    text: "SELECT * FROM reviews WHERE review_id = $1",
+    text: "SELECT reviews.* , COUNT(comments) AS comment_count from reviews LEFT JOIN comments ON reviews.review_id = comments.review_id WHERE reviews.review_id = $1 GROUP BY reviews.review_id;",
     values: [review_id],
   };
   return db.query(reviewQuery).then((res) => {

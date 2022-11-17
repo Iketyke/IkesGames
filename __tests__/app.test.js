@@ -72,7 +72,7 @@ describe("/api/reviews", () => {
   });
   describe("/api/reviews/:review_id", () => {
     test("GET - 200 responds with a single review object", () => {
-      const review_id = 4;
+      const review_id = 2;
       return request(app)
         .get("/api/reviews/" + review_id)
         .expect(200)
@@ -80,18 +80,41 @@ describe("/api/reviews", () => {
           expect(body.review).toEqual(
             expect.objectContaining({
               review_id: review_id,
-              title: expect.any(String),
-              review_body: expect.any(String),
-              designer: expect.any(String),
-              review_img_url: expect.any(String),
-              votes: expect.any(Number),
-              category: expect.any(String),
-              owner: expect.any(String),
+              title: 'Jenga',
+              review_body: 'Fiddly fun for all the family',
+              designer: 'Leslie Scott',
+              review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+              votes: 5,
+              category: 'dexterity',
+              owner: 'philippaclaire9',
               created_at: expect.any(String),
             })
           );
         });
     });
+    test("GET - 200 responds with a single review object with a comment count", () => {
+      const review_id = 2;
+      return request(app)
+        .get("/api/reviews/" + review_id)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.review).toEqual(
+            expect.objectContaining({
+              comment_count: "3",
+              review_id: review_id,
+              title: 'Jenga',
+              review_body: 'Fiddly fun for all the family',
+              designer: 'Leslie Scott',
+              review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+              votes: 5,
+              category: 'dexterity',
+              owner: 'philippaclaire9',
+              created_at: expect.any(String),
+            })
+          );
+        });
+    });
+
     test("PATCH - 200 increments votes", () => {
       const review_id = 2;
       const votes = { inc_votes: 5 };
