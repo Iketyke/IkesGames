@@ -23,8 +23,8 @@ describe("/api/categories", () => {
       });
   });
 });
-describe("/api/users", () => {
-  test("GET - 200 responds with an array of user objects", () => {
+describe('/api/users', () => {
+  test('GET - 200 responds with an array of user objects', () => {
     return request(app)
       .get("/api/users")
       .expect(200)
@@ -39,6 +39,16 @@ describe("/api/users", () => {
             })
           );
         });
+      });
+  });
+});
+describe("/api/comments/:comment_id", () => {
+  test("DELETE - 204 deletes the given comment by comment_id", () => {
+    return request(app)
+      .delete("/api/comments/4")
+      .expect(204)
+      .then((res) => {
+        expect(res.body).toEqual({});
       });
   });
 });
@@ -333,6 +343,24 @@ describe("Error Handling", () => {
       .then((res) => {
         expect(res.body.msg).toBe("Not Found");
       });
+  });
+  describe('/api/comments/:comments_id', () => {
+    test("GET - 404 comment not found", () => {
+      return request(app)
+        .delete("/api/comments/1000000")
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("Comment Not Found");
+        });
+    });
+    test("GET - 400 invalid id", () => {
+      return request(app)
+        .delete("/api/comments/notacommentid")
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("Bad Request");
+        });
+    });
   });
   describe("/api/reviews", () => {
     test("GET - 400 invalid sort_by query - bad request", () => {
