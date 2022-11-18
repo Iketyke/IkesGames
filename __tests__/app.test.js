@@ -3,11 +3,22 @@ const app = require("../app.js");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 const connection = require("../db/connection.js");
+const endpoints = require("../endpoints.json");
 require("jest-sorted");
 
 beforeEach(() => seed(testData));
 afterAll(() => connection.end());
 
+describe("/api", () => {
+  test("GET - 200 responds with JSON of all available endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual(endpoints);
+      });
+  });
+});
 describe("/api/categories", () => {
   test("GET - 200 responds with an array of category objects", () => {
     return request(app)
@@ -23,8 +34,8 @@ describe("/api/categories", () => {
       });
   });
 });
-describe('/api/users', () => {
-  test('GET - 200 responds with an array of user objects', () => {
+describe("/api/users", () => {
+  test("GET - 200 responds with an array of user objects", () => {
     return request(app)
       .get("/api/users")
       .expect(200)
@@ -192,9 +203,7 @@ describe("/api/reviews", () => {
   });
   test("GET - 200 an category with no reviews returns an empty array", () => {
     return request(app)
-      .get(
-        "/api/reviews?category=children's%20games"
-      )
+      .get("/api/reviews?category=children's%20games")
       .expect(200)
       .then((res) => {
         expect(Array.isArray(res.body)).toBe(true);
@@ -248,7 +257,6 @@ describe("/api/reviews", () => {
           );
         });
     });
-
     test("PATCH - 200 increments votes", () => {
       const review_id = 2;
       const votes = { inc_votes: 5 };
@@ -344,7 +352,7 @@ describe("Error Handling", () => {
         expect(res.body.msg).toBe("Not Found");
       });
   });
-  describe('/api/comments/:comments_id', () => {
+  describe("/api/comments/:comments_id", () => {
     test("GET - 404 comment not found", () => {
       return request(app)
         .delete("/api/comments/1000000")
@@ -365,27 +373,27 @@ describe("Error Handling", () => {
   describe("/api/reviews", () => {
     test("GET - 400 invalid sort_by query - bad request", () => {
       return request(app)
-          .get("/api/reviews?sort_by=genre")
-          .expect(400)
-          .then((res) => {
-            expect(res.body.msg).toBe("Bad Request");
-          });
+        .get("/api/reviews?sort_by=genre")
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("Bad Request");
+        });
     });
     test("GET - 400 invalid order query - bad request", () => {
       return request(app)
-          .get("/api/reviews?order=lefttoright")
-          .expect(400)
-          .then((res) => {
-            expect(res.body.msg).toBe("Bad Request");
-          });
+        .get("/api/reviews?order=lefttoright")
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("Bad Request");
+        });
     });
     test("GET - 400 invalid order query - bad request", () => {
       return request(app)
-          .get("/api/reviews?category=notavalidcategory")
-          .expect(400)
-          .then((res) => {
-            expect(res.body.msg).toBe("Bad Request");
-          });
+        .get("/api/reviews?category=notavalidcategory")
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("Bad Request");
+        });
     });
     describe("/api/reviews/:reviews_id", () => {
       test("GET - 400 invalid review_id: Bad Request", () => {

@@ -1,11 +1,14 @@
 const { getCategories } = require("./controllers/categoriesController");
 const { getReviews, getReview, patchReview } = require("./controllers/reviewsController");
 const { getComments, postComment, deleteComment } = require("./controllers/commentsController");
+const { getEndpoints } = require("./controllers/Endpoints");
 const { getUsers } = require("./controllers/usersController");
 
 const express = require("express");
 const app = express();
 app.use(express.json());
+
+app.get("/api", getEndpoints)
 
 //Categories 
 app.get("/api/categories", getCategories);
@@ -20,6 +23,7 @@ app.delete("/api/comments/:comment_id", deleteComment);
 
 //Users
 app.get("/api/users", getUsers);
+
 
 //Error Handling
 app.all("/*", (req, res) => {

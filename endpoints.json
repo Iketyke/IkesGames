@@ -20,15 +20,112 @@
     "exampleResponse": {
       "reviews": [
         {
+          "review_id": 2,
           "title": "One Night Ultimate Werewolf",
           "designer": "Akihisa Okui",
           "owner": "happyamy2016",
           "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
           "category": "hidden-roles",
           "created_at": 1610964101251,
-          "votes": 5
+          "votes": 5,
+          "comment_count": 4
         }
       ]
     }
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "dav3rid",
+          "name": "dave",
+          "avatar_url":
+            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+        }
+      ]
+    }
+  },
+  "GET /api/reviews/:review_id": {
+    "description": "serves an individual review with the id specified",
+    "params": ["review_id"],
+    "exampleResponse": {
+      "review": {
+        "review_id": 4,
+        "title": "One Night Ultimate Werewolf",
+        "designer": "Akihisa Okui",
+        "owner": "happyamy2016",
+        "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+        "category": "hidden-roles",
+        "created_at": 1610964101251,
+        "votes": 5,
+        "review_body": "Fiddly fun for all the family",
+        "comment_count": 3
+      }
+    }
+  },
+  "GET /api/reviews/:review_id/comments": {
+    "description": "serves an array of all comments on the specified review",
+    "params": ["review_id"],
+    "exampleResponse": {
+      "review": {
+        "comment_id": 4,
+        "author": "happyamy2016",
+        "created_at": 1610964101251,
+        "votes": 5,
+        "body": "Cracking review!",
+        "review_id": 4
+      }
+    }
+  },
+  "POST /api/reviews/:review_id/comments": {
+    "description": "posts a new comment on the specified review",
+    "params": ["review_id"],
+    "ExampleBody": {
+      "username": "example_user",
+      "body": "example_comment"
+    },
+    "exampleResponse": {
+      "review": {
+        "comment_id": 7,
+        "author": "example_user",
+        "created_at": 1610964101251,
+        "votes": 0,
+        "body": "example_comment",
+        "review_id": 4
+      }
+    }
+  },
+  "PATCH /api/reviews/:review_id": {
+    "description": "increments/decrements votes on the specified review and returns the updated version",
+    "params": ["review_id"],
+    "originalReview": {
+      "review": {
+        "comment_id": 7,
+        "author": "example_user",
+        "created_at": 1610964101251,
+        "votes": 1,
+        "body": "example_comment",
+        "review_id": 4
+      }
+    } ,
+    "exampleBody1": {
+      "inc_votes": 5
+    },
+    "exampleResponse1": {
+      "review": {
+        "comment_id": 7,
+        "author": "example_user",
+        "created_at": 1610964101251,
+        "votes": 6,
+        "body": "example_comment",
+        "review_id": 4
+      }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the comment with the specified id: no response",
+    "params": ["comment_id"]
   }
 }
