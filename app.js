@@ -4,9 +4,9 @@ const { getComments, postComment, deleteComment } = require("./controllers/comme
 const { getEndpoints } = require("./controllers/Endpoints");
 const { getUsers } = require("./controllers/usersController");
 const cors = require('cors');
-app.use(cors());
 const express = require("express");
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.get("/api", getEndpoints)
