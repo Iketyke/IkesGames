@@ -3,7 +3,8 @@ const { getReviews, getReview, patchReview } = require("./controllers/reviewsCon
 const { getComments, postComment, deleteComment } = require("./controllers/commentsController");
 const { getEndpoints } = require("./controllers/Endpoints");
 const { getUsers } = require("./controllers/usersController");
-
+const cors = require('cors');
+app.use(cors());
 const express = require("express");
 const app = express();
 app.use(express.json());
